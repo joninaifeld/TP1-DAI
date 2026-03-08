@@ -5,10 +5,15 @@ const timeEl = document.getElementById('time');
 const nextPhraseBtn = document.getElementById('nextPhraseBtn');
 const cardEl = document.querySelector('.card');
 const fortuneShellEl = document.querySelector('.fortune-shell');
+const rainLayerEl = document.getElementById('rainLayer');
 const rejectStampEl = document.getElementById('rejectStamp');
 const defaultButtonLabel = nextPhraseBtn.textContent;
 
 const NAAS_ENDPOINT = 'https://naas.isalman.dev/no';
+const CHIP_LABELS = ['NO', 'NOP', 'NEGADO'];
+
+let rainTimeoutId = null;
+let lastDropX = null;
 
 const normalizePhrase = (value) => {
     const text = String(value || '').trim();
@@ -61,7 +66,7 @@ const fetchNoAsAService = async () => {
 
     return {
         phrase: normalizePhrase(phrase),
-        source: 'naas.isalman.dev'
+        source: 'by jeesssik'
     };
 };
 
@@ -73,6 +78,50 @@ const getRandomWaitingMessage = () => {
     ];
 
     return messages[Math.floor(Math.random() * messages.length)];
+};
+
+const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+const spawnNoChip = () => {
+    if (!rainLayerEl) {
+        return;
+    }
+
+    const chipEl = document.createElement('span');
+    chipEl.className = 'rain-chip';
+    chipEl.textContent = CHIP_LABELS[Math.floor(Math.random() * CHIP_LABELS.length)];
+
+    let xPercent = randomInRange(1, 96);
+    if (lastDropX !== null && Math.abs(xPercent - lastDropX) < 12) {
+        xPercent = (xPercent + randomInRange(14, 28)) % 97;
+    }
+
+    lastDropX = xPercent;
+
+    chipEl.style.left = `${xPercent}%`;
+    chipEl.style.setProperty('--chip-duration', `${randomInRange(6.3, 10.4).toFixed(2)}s`);
+    chipEl.style.setProperty('--chip-drift', `${randomInRange(-18, 18).toFixed(1)}px`);
+    chipEl.style.setProperty('--chip-rotation', `${randomInRange(-8, 8).toFixed(1)}deg`);
+
+    rainLayerEl.appendChild(chipEl);
+
+    const lifeTimeMs = Number.parseFloat(chipEl.style.getPropertyValue('--chip-duration')) * 1000;
+    window.setTimeout(() => {
+        chipEl.remove();
+    }, lifeTimeMs + 250);
+};
+
+const scheduleRain = () => {
+    spawnNoChip();
+    rainTimeoutId = window.setTimeout(scheduleRain, randomInRange(780, 1650));
+};
+
+const startNoRain = () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || rainTimeoutId) {
+        return;
+    }
+
+    scheduleRain();
 };
 
 const renderPhrase = ({ phrase, source }) => {
@@ -110,4 +159,5 @@ const loadPhrase = async () => {
 };
 
 nextPhraseBtn.addEventListener('click', loadPhrase);
+startNoRain();
 loadPhrase();
