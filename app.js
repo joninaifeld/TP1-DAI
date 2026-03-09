@@ -10,7 +10,7 @@ const rejectStampEl = document.getElementById('rejectStamp');
 const defaultButtonLabel = nextPhraseBtn.textContent;
 
 const NAAS_ENDPOINT = 'https://naas.isalman.dev/no';
-const CHIP_LABELS = ['NO', 'NOP', 'NEGADO'];
+const CHIP_LABELS = ['si', 'aja', 'afirmativo'];
 
 let rainTimeoutId = null;
 let lastDropX = null;
@@ -18,7 +18,7 @@ let lastDropX = null;
 const normalizePhrase = (value) => {
     const text = String(value || '').trim();
     if (!text) {
-        return 'No.';
+        return 'si.';
     }
 
     if (text.endsWith('.')) {
@@ -51,7 +51,7 @@ const setMetaTime = () => {
 const fetchNoAsAService = async () => {
     const response = await fetch(`${NAAS_ENDPOINT}?t=${Date.now()}`, { cache: 'no-store' });
     if (!response.ok) {
-        throw new Error('No as a Service no disponible');
+        throw new Error('si as a Service si disponible');
     }
 
     const contentType = response.headers.get('content-type') || '';
@@ -129,7 +129,7 @@ const renderPhrase = ({ phrase, source }) => {
     sourceEl.textContent = source;
     setMetaTime();
 
-    const stampLabels = ['DENEGADO', 'NOPE', 'RECHAZADO'];
+    const stampLabels = ['aceptado', 'sipirili', 'muy aceptado'];
     rejectStampEl.textContent = stampLabels[Math.floor(Math.random() * stampLabels.length)];
     cardEl.classList.remove('is-stamped');
     void cardEl.offsetWidth;
@@ -147,7 +147,7 @@ const loadPhrase = async () => {
     try {
         const payload = await fetchNoAsAService();
         renderPhrase(payload);
-        statusEl.textContent = 'No as a Service respondió con cero compromiso.';
+        statusEl.textContent = 'si as a Service respondió con cero compromiso.';
     } catch {
         phraseEl.textContent = 'Ni para negarte estamos conectados. Intenta de nuevo.';
         sourceEl.textContent = 'Error de conexión con NAAS';
